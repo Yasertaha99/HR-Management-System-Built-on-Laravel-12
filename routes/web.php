@@ -28,6 +28,10 @@ Route::middleware('auth')->group(function () {
     // Attendance Management System (Livewire)
     Route::get('/attendance/dashboard', \App\Livewire\Attendance\Dashboard::class)->name('attendance.dashboard');
     Route::get('/attendance/manage', \App\Livewire\Admin\AttendanceManager::class)->name('attendance.manage');
+
+    // Enterprise Payroll & Payslips (Livewire)
+    Route::get('/payroll/dashboard', \App\Livewire\Payroll\PayrollDashboard::class)->name('payroll.dashboard');
+    Route::get('/payroll/payslips/{id?}', \App\Livewire\Payroll\EmployeePayslips::class)->name('payroll.payslips');
 });
 
 Auth::routes();

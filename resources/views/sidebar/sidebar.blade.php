@@ -49,6 +49,8 @@
                         <li><a class="{{set_active(['form/leavesettings/page'])}}" href="{{ route('form/leavesettings/page') }}">Leave Settings</a></li>
                         <li><a class="{{set_active(['attendance/dashboard'])}}" href="{{ route('attendance.dashboard') }}"><i class="fa fa-clock-o text-success mr-1"></i> Attendance Dashboard</a></li>
                         <li><a class="{{set_active(['attendance/manage'])}}" href="{{ route('attendance.manage') }}"><i class="fa fa-users text-primary mr-1"></i> Attendance Manager</a></li>
+                        <li><a class="{{set_active(['payroll/dashboard'])}}" href="{{ route('payroll.dashboard') }}"><i class="fa fa-money text-warning mr-1"></i> Payroll Dashboard</a></li>
+                        <li><a class="{{set_active(['payroll/payslips'])}}" href="{{ route('payroll.payslips') }}"><i class="fa fa-file-text-o text-info mr-1"></i> My Payslips</a></li>
                         <li><a class="{{set_active(['attendance/page'])}}" href="{{ route('attendance/page') }}">Attendance (Admin)</a></li>
                         <li><a class="{{set_active(['attendance/employee/page'])}}" href="{{ route('attendance/employee/page') }}">Attendance (Employee)</a></li>
                         <li><a class="{{set_active(['form/departments/page'])}}" href="{{ route('form/departments/page') }}">Departments</a></li>
