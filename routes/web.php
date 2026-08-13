@@ -37,6 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/notifications', \App\Livewire\Settings\NotificationPreferencesPage::class)->name('settings.notifications');
 });
 
+// Telegram Webhook (External API)
+Route::post('/webhooks/telegram', [\App\Http\Controllers\TelegramWebhookController::class, 'handle'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 Auth::routes();
 
 Route::group(['namespace' => 'App\Http\Controllers\Auth'],function()
