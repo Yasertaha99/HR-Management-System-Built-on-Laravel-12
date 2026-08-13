@@ -11,7 +11,8 @@ use Illuminate\Support\Collection;
 class AttendanceStatisticsService
 {
     public function __construct(
-        private readonly AttendanceQueryService $queryService
+        private readonly AttendanceQueryService $queryService,
+        private readonly AttendanceCalculationEngine $engine
     ) {}
 
     /**
@@ -40,18 +41,20 @@ class AttendanceStatisticsService
             }
 
             if ($attendance) {
-                if ($attendance->isWorking()) {
+                $calc = $this->engine->calculateForModel($attendance);
+
+                if ($calc->status === AttendanceStatus::WORKING) {
                     $workingCount++;
                     $presentCount++;
                 }
 
-                if ($attendance->isCompleted()) {
+                if ($calc->status === AttendanceStatus::COMPLETED) {
                     $completedCount++;
                     $presentCount++;
-                    $totalActualMinutes += ($attendance->total_minutes ?? 0);
-                    $totalRoundedHours += ($attendance->rounded_hours ?? 0);
-                    $totalLateMinutes += ($attendance->late_minutes ?? 0);
-                    $totalOvertimeMinutes += ($attendance->overtime_minutes ?? 0);
+                    $totalActualMinutes += $calc->totalMinutes;
+                    $totalRoundedHours += $calc->roundedHours;
+                    $totalLateMinutes += $calc->lateMinutes;
+                    $totalOvertimeMinutes += $calc->overtimeMinutes;
                 }
             }
         }

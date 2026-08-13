@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class CheckOutService
 {
     public function __construct(
-        private readonly WorkingTimeCalculator $calculator
+        private readonly AttendanceCalculationEngine $engine
     ) {}
 
     /**
@@ -49,26 +49,17 @@ class CheckOutService
                 throw new InvalidAttendanceActionException("Checkout timestamp cannot be earlier than check-in timestamp.");
             }
 
-            // Calculate actual working duration in minutes (never destroyed)
-            $totalMinutes = $this->calculator->calculateTotalMinutes($attendance->check_in, $data->timestamp);
-
-            // Calculate rounded working hours using the strategy pattern
-            $roundedHours = $this->calculator->calculateRoundedHours($totalMinutes);
-
-            // Find user work schedule day if assigned
             $user = $attendance->user;
-            $dayOfWeek = $data->timestamp->dayOfWeek; // 0 = Sunday, 1 = Monday...
-            $scheduleDay = null;
 
-            if ($user && $user->work_schedule_id) {
-                $scheduleDay = WorkScheduleDay::where('work_schedule_id', $user->work_schedule_id)
-                    ->where('day_of_week', $dayOfWeek)
-                    ->first();
-            }
-
-            $lateMinutes = $this->calculator->calculateLateMinutes($attendance->check_in, $scheduleDay);
-            $earlyLeaveMinutes = $this->calculator->calculateEarlyLeaveMinutes($data->timestamp, $scheduleDay);
-            $overtimeMinutes = $this->calculator->calculateOvertimeMinutes($totalMinutes, $scheduleDay);
+            // Authoritative attendance calculation via AttendanceCalculationEngine
+            $calcResult = $this->engine->calculate(
+                userId: $data->userId,
+                attendanceDate: $today,
+                checkIn: $attendance->check_in,
+                checkOut: $data->timestamp,
+                status: AttendanceStatus::COMPLETED,
+                workScheduleId: $user?->work_schedule_id
+            );
 
             $oldValues = $attendance->toArray();
 
@@ -76,11 +67,11 @@ class CheckOutService
             $attendance->update([
                 'check_out' => $data->timestamp,
                 'status' => AttendanceStatus::COMPLETED,
-                'total_minutes' => $totalMinutes,
-                'rounded_hours' => $roundedHours,
-                'late_minutes' => $lateMinutes,
-                'early_leave_minutes' => $earlyLeaveMinutes,
-                'overtime_minutes' => $overtimeMinutes,
+                'total_minutes' => $calcResult->totalMinutes,
+                'rounded_hours' => $calcResult->roundedHours,
+                'late_minutes' => $calcResult->lateMinutes,
+                'early_leave_minutes' => $calcResult->earlyLeaveMinutes,
+                'overtime_minutes' => $calcResult->overtimeMinutes,
                 'notes' => $data->notes ?? $attendance->notes,
             ]);
 
@@ -94,11 +85,11 @@ class CheckOutService
                 'new_values' => [
                     'check_out' => $data->timestamp->toIso8601String(),
                     'status' => AttendanceStatus::COMPLETED->value,
-                    'total_minutes' => $totalMinutes,
-                    'rounded_hours' => $roundedHours,
-                    'late_minutes' => $lateMinutes,
-                    'early_leave_minutes' => $earlyLeaveMinutes,
-                    'overtime_minutes' => $overtimeMinutes,
+                    'total_minutes' => $calcResult->totalMinutes,
+                    'rounded_hours' => $calcResult->roundedHours,
+                    'late_minutes' => $calcResult->lateMinutes,
+                    'early_leave_minutes' => $calcResult->earlyLeaveMinutes,
+                    'overtime_minutes' => $calcResult->overtimeMinutes,
                 ],
                 'ip_address' => $data->ipAddress,
                 'user_agent' => $data->userAgent,
