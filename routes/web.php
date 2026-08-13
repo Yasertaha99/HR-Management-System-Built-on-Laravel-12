@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     // Enterprise Payroll & Payslips (Livewire)
     Route::get('/payroll/dashboard', \App\Livewire\Payroll\PayrollDashboard::class)->name('payroll.dashboard');
     Route::get('/payroll/payslips/{id?}', \App\Livewire\Payroll\EmployeePayslips::class)->name('payroll.payslips');
+
+    // Notification Preferences & Telegram Settings
+    Route::get('/settings/notifications', \App\Livewire\Settings\NotificationPreferencesPage::class)->name('settings.notifications');
 });
 
 Auth::routes();
