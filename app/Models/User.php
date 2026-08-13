@@ -94,4 +94,28 @@ class User extends Authenticatable
         }
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function workSchedule()
+    {
+        return $this->belongsTo(WorkSchedule::class, 'work_schedule_id');
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array($this->role_name, ['Admin', 'Super Admin', 'Administrator', 'CEO']);
+    }
+
+    public function isManager(): bool
+    {
+        return in_array($this->role_name, ['Manager', 'Team Leader']) || $this->isAdmin();
+    }
+
+    public function isHr(): bool
+    {
+        return in_array($this->role_name, ['HR', 'Human Resources']) || $this->isAdmin();
+    }
 }

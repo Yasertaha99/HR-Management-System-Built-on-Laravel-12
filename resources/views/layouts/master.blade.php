@@ -26,6 +26,7 @@
 	<link rel="stylesheet" href="{{ URL::to('assets/css/bootstrap-datetimepicker.min.css') }}">
 	<!-- Main CSS -->
 	<link rel="stylesheet" href="{{ URL::to('assets/css/style.css') }}">
+	@livewireStyles
 </head>
 
 <body>
@@ -328,7 +329,13 @@
 		@include('sidebar.sidebar')
 		<!-- /Sidebar -->
 		<!-- Page Wrapper -->
-		@yield('content')
+		@if (isset($slot))
+			<div class="page-wrapper">
+				{{ $slot }}
+			</div>
+		@else
+			@yield('content')
+		@endif
 		<!-- /Page Wrapper -->
 	</div>
 	<!-- /Main Wrapper -->
@@ -362,5 +369,6 @@
 	<!-- Custom JS -->
 	<script src="{{ URL::to('assets/js/app.js') }}"></script>
 	@yield('script')
+	@livewireScripts
 </body>
 </html>

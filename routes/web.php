@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::get('home', function () {
         return view('home');
     });
+
+    // Attendance Management System (Livewire)
+    Route::get('/attendance/dashboard', \App\Livewire\Attendance\Dashboard::class)->name('attendance.dashboard');
+    Route::get('/attendance/manage', \App\Livewire\Admin\AttendanceManager::class)->name('attendance.manage');
 });
 
 Auth::routes();
